@@ -30,9 +30,14 @@ class Keuangan:
 
 # Kelas Pengelolaan Stok
 class Stok:
-    def __init__(self, file_csv):
-        # Membaca data stok dari file CSV
-        self.stok_barang = pd.read_csv(file_csv)
+    def __init__(self):
+        # Simulasi stok barang awal
+        self.stok_barang = pd.DataFrame({
+            'Kode Barang': ['B001', 'B002', 'B003'],
+            'Nama Barang': ['Produk A', 'Produk B', 'Produk C'],
+            'Jumlah': [10, 20, 30],
+            'Harga': [5000, 7000, 9000]
+        })
         
     def tambah_barang(self, kode, nama, jumlah, harga):
         # Menambah barang baru ke DataFrame
@@ -80,13 +85,13 @@ def visualisasi_keuangan(keuangan):
     # Menampilkan plot dengan Streamlit
     st.pyplot(fig)
 
-# URL mentah dari file CSV di GitHub
-keuangan_url = "https://raw.githubusercontent.com/Kaepci/kupengenmeletup/refs/heads/main/keuangan.csv"
-stok_url = "https://raw.githubusercontent.com/Kaepci/kupengenmeletup/refs/heads/main/stok.csv"
-
 # Membaca file CSV langsung dari GitHub
+keuangan_url = "https://raw.githubusercontent.com/username/repository/main/keuangan.csv"
+stok_url = "https://raw.githubusercontent.com/username/repository/main/stok.csv"
+
+# Inisialisasi objek Keuangan dan Stok
 keuangan = Keuangan(keuangan_url)
-stok = Stok(stok_url)
+stok = Stok()
 
 # Streamlit UI untuk memperbarui CSV
 def app():
