@@ -82,7 +82,7 @@ def visualisasi_keuangan(keuangan):
 
 # URL mentah dari file CSV di GitHub
 keuangan_url = "https://raw.githubusercontent.com/Kaepci/kupengenmeletup/refs/heads/main/keuangan.csv"
-stok_url = "https://raw.githubusercontent.com/Kaepci/kupengenmeletup/refs/heads/main/stok.csv"
+stok_url = "https://raw.githubusercontent.com/Kaepci/kupengenmeletup/main/stok.csv"
 
 # Membaca file CSV langsung dari GitHub
 keuangan = Keuangan(keuangan_url)
@@ -93,7 +93,7 @@ def app():
     st.title('Manajemen Keuangan dan Stok')
 
     # Menampilkan laporan keuangan
-    pemasukan, pengeluaran, saldo_akhir = keuangan.tampilkan_laporan()
+    pemasukan, pengeluaran, saldo_akhir = keuangan.laporan_keuangan()
     st.subheader("Laporan Keuangan")
     st.write(f"Pemasukan: {pemasukan}")
     st.write(f"Pengeluaran: {pengeluaran}")
@@ -114,9 +114,8 @@ def app():
 
         if submit_button:
             keuangan.tambah_transaksi(str(tanggal), jenis, jumlah, keterangan)
-            keuangan.simpan_transaksi(keuangan_url)
             st.success("Transaksi berhasil ditambahkan!")
-    
+
     # Mengedit stok barang
     st.subheader("Edit Stok Barang")
     with st.form(key='stok_form'):
@@ -126,7 +125,6 @@ def app():
 
         if submit_button_stok:
             stok.update_stok(kode_barang, jumlah_stok)
-            stok.simpan_stok(stok_url)
             st.success("Stok berhasil diperbarui!")
 
     # Analisa Keuangan dan Stok
@@ -140,6 +138,14 @@ def app():
     # Visualisasi Keuangan
     visualisasi_keuangan(keuangan)
 
+    # Upload File CSV untuk update
+    st.subheader("Unggah File CSV untuk Update")
+    uploaded_file = st.file_uploader("Pilih file CSV", type=["csv"])
+    if uploaded_file is not None:
+        # Membaca file yang di-upload
+        uploaded_data = pd.read_csv(uploaded_file)
+        st.write(uploaded_data)
+        st.success("File CSV berhasil di-upload!")
+
 if __name__ == "__main__":
     app()
-
