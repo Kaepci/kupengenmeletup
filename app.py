@@ -26,8 +26,7 @@ class Keuangan:
 
     def tampilkan_laporan(self):
         # Menampilkan laporan keuangan
-        pemasukan, pengeluaran, saldo_akhir = self.laporan_keuangan()
-        return pemasukan, pengeluaran, saldo_akhir
+        return self.transaksi
 
 # Kelas Pengelolaan Stok
 class Stok:
@@ -78,9 +77,10 @@ def visualisasi_keuangan(keuangan):
     ax.set_title("Visualisasi Laporan Keuangan")
     ax.set_ylabel("Jumlah")
     
+    # Menampilkan plot dengan Streamlit
     st.pyplot(fig)
 
-# Streamlit UI
+# Streamlit UI untuk memperbarui CSV
 def app():
     st.title('Manajemen Keuangan dan Stok')
 
@@ -103,6 +103,32 @@ def app():
         # Menampilkan laporan stok
         st.subheader("Laporan Stok Barang")
         st.write(stok.tampilkan_laporan())
+
+        # Mengedit transaksi keuangan
+        st.subheader("Edit Transaksi Keuangan")
+        with st.form(key='keuangan_form'):
+            tanggal = st.date_input("Tanggal")
+            jenis = st.selectbox("Jenis", ["Pemasukan", "Pengeluaran"])
+            jumlah = st.number_input("Jumlah", min_value=0)
+            keterangan = st.text_input("Keterangan")
+            submit_button = st.form_submit_button(label='Tambah Transaksi')
+
+            if submit_button:
+                keuangan.tambah_transaksi(str(tanggal), jenis, jumlah, keterangan)
+                keuangan.simpan_transaksi(keuangan_file)
+                st.success("Transaksi berhasil ditambahkan!")
+        
+        # Mengedit stok barang
+        st.subheader("Edit Stok Barang")
+        with st.form(key='stok_form'):
+            kode_barang = st.text_input("Kode Barang")
+            jumlah_stok = st.number_input("Jumlah Stok", min_value=0)
+            submit_button_stok = st.form_submit_button(label='Update Stok')
+
+            if submit_button_stok:
+                stok.update_stok(kode_barang, jumlah_stok)
+                stok.simpan_stok(stok_file)
+                st.success("Stok berhasil diperbarui!")
 
         # Analisa Keuangan dan Stok
         total_nilai_stok, saldo, warning = analisa_keuangan_ke_stok(keuangan, stok)
