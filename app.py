@@ -80,66 +80,66 @@ def visualisasi_keuangan(keuangan):
     # Menampilkan plot dengan Streamlit
     st.pyplot(fig)
 
+# URL mentah dari file CSV di GitHub
+keuangan_url = "https://raw.githubusercontent.com/username/repository/main/keuangan.csv"
+stok_url = "https://raw.githubusercontent.com/username/repository/main/stok.csv"
+
+# Membaca file CSV langsung dari GitHub
+keuangan = Keuangan(keuangan_url)
+stok = Stok(stok_url)
+
 # Streamlit UI untuk memperbarui CSV
 def app():
     st.title('Manajemen Keuangan dan Stok')
 
-    # Upload file CSV
-    keuangan_file = st.file_uploader("Upload File Keuangan (CSV)", type=["csv"])
-    stok_file = st.file_uploader("Upload File Stok (CSV)", type=["csv"])
+    # Menampilkan laporan keuangan
+    pemasukan, pengeluaran, saldo_akhir = keuangan.tampilkan_laporan()
+    st.subheader("Laporan Keuangan")
+    st.write(f"Pemasukan: {pemasukan}")
+    st.write(f"Pengeluaran: {pengeluaran}")
+    st.write(f"Saldo Akhir: {saldo_akhir}")
 
-    if keuangan_file and stok_file:
-        # Load data dari file CSV
-        keuangan = Keuangan(keuangan_file)
-        stok = Stok(stok_file)
+    # Menampilkan laporan stok
+    st.subheader("Laporan Stok Barang")
+    st.write(stok.tampilkan_laporan())
 
-        # Menampilkan laporan keuangan
-        pemasukan, pengeluaran, saldo_akhir = keuangan.tampilkan_laporan()
-        st.subheader("Laporan Keuangan")
-        st.write(f"Pemasukan: {pemasukan}")
-        st.write(f"Pengeluaran: {pengeluaran}")
-        st.write(f"Saldo Akhir: {saldo_akhir}")
+    # Mengedit transaksi keuangan
+    st.subheader("Edit Transaksi Keuangan")
+    with st.form(key='keuangan_form'):
+        tanggal = st.date_input("Tanggal")
+        jenis = st.selectbox("Jenis", ["Pemasukan", "Pengeluaran"])
+        jumlah = st.number_input("Jumlah", min_value=0)
+        keterangan = st.text_input("Keterangan")
+        submit_button = st.form_submit_button(label='Tambah Transaksi')
 
-        # Menampilkan laporan stok
-        st.subheader("Laporan Stok Barang")
-        st.write(stok.tampilkan_laporan())
+        if submit_button:
+            keuangan.tambah_transaksi(str(tanggal), jenis, jumlah, keterangan)
+            keuangan.simpan_transaksi(keuangan_url)
+            st.success("Transaksi berhasil ditambahkan!")
+    
+    # Mengedit stok barang
+    st.subheader("Edit Stok Barang")
+    with st.form(key='stok_form'):
+        kode_barang = st.text_input("Kode Barang")
+        jumlah_stok = st.number_input("Jumlah Stok", min_value=0)
+        submit_button_stok = st.form_submit_button(label='Update Stok')
 
-        # Mengedit transaksi keuangan
-        st.subheader("Edit Transaksi Keuangan")
-        with st.form(key='keuangan_form'):
-            tanggal = st.date_input("Tanggal")
-            jenis = st.selectbox("Jenis", ["Pemasukan", "Pengeluaran"])
-            jumlah = st.number_input("Jumlah", min_value=0)
-            keterangan = st.text_input("Keterangan")
-            submit_button = st.form_submit_button(label='Tambah Transaksi')
+        if submit_button_stok:
+            stok.update_stok(kode_barang, jumlah_stok)
+            stok.simpan_stok(stok_url)
+            st.success("Stok berhasil diperbarui!")
 
-            if submit_button:
-                keuangan.tambah_transaksi(str(tanggal), jenis, jumlah, keterangan)
-                keuangan.simpan_transaksi(keuangan_file)
-                st.success("Transaksi berhasil ditambahkan!")
-        
-        # Mengedit stok barang
-        st.subheader("Edit Stok Barang")
-        with st.form(key='stok_form'):
-            kode_barang = st.text_input("Kode Barang")
-            jumlah_stok = st.number_input("Jumlah Stok", min_value=0)
-            submit_button_stok = st.form_submit_button(label='Update Stok')
-
-            if submit_button_stok:
-                stok.update_stok(kode_barang, jumlah_stok)
-                stok.simpan_stok(stok_file)
-                st.success("Stok berhasil diperbarui!")
-
-        # Analisa Keuangan dan Stok
-        total_nilai_stok, saldo, warning = analisa_keuangan_ke_stok(keuangan, stok)
-        st.subheader("Analisa Keuangan dan Stok")
-        st.write(f"Total Nilai Stok Barang: {total_nilai_stok}")
-        st.write(f"Saldo Keuangan: {saldo}")
-        if warning:
-            st.warning(warning)
-        
-        # Visualisasi Keuangan
-        visualisasi_keuangan(keuangan)
+    # Analisa Keuangan dan Stok
+    total_nilai_stok, saldo, warning = analisa_keuangan_ke_stok(keuangan, stok)
+    st.subheader("Analisa Keuangan dan Stok")
+    st.write(f"Total Nilai Stok Barang: {total_nilai_stok}")
+    st.write(f"Saldo Keuangan: {saldo}")
+    if warning:
+        st.warning(warning)
+    
+    # Visualisasi Keuangan
+    visualisasi_keuangan(keuangan)
 
 if __name__ == "__main__":
     app()
+
