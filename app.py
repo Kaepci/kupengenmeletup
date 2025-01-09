@@ -82,7 +82,7 @@ def visualisasi_keuangan(keuangan):
 
 # URL mentah dari file CSV di GitHub
 keuangan_url = "https://raw.githubusercontent.com/Kaepci/kupengenmeletup/refs/heads/main/keuangan.csv"
-stok_url = "https://raw.githubusercontent.com/Kaepci/kupengenmeletup/main/stok.csv"
+stok_url = "https://raw.githubusercontent.com/Kaepci/kupengenmeletup/refs/heads/main/stok.csv"
 
 # Membaca file CSV langsung dari GitHub
 keuangan = Keuangan(keuangan_url)
